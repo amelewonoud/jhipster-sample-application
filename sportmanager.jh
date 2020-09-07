@@ -1,0 +1,134 @@
+application {
+  config {
+    baseName app1
+    applicationType microservice
+    authenticationType oauth2
+    enableSwaggerCodegen true
+    skipClient true
+  }
+  entities User, Competition, Club, Team, TeamMember, ClubMember, Event, Ground
+}
+
+
+
+entity Address {
+	street String
+    route String 
+    state String 
+    locality String 
+    country String 
+	zip String 
+    allText String 
+    phone String
+  	position GeoJsonPoint
+}
+
+enum Sport {
+    SOCCER, 
+    BASKET, 
+    BASEBALL, 
+    CRICKET, 
+    ESPORTS, 
+    GOLF, 
+    HANDBALL,
+    HOCKEY,
+    RUGBY,
+    VOLEY,
+    TENNIS,
+    FOOTBALL
+}
+
+enum Gender {
+	MALE, 
+    FEMALE
+}
+entity User {
+	email String required maxlength(50) unique
+    firstname String required minlength(2) maxlength(25)
+    lastname String required minlength(2) maxlength(25)
+    password String required maxlength(25)
+    address Address
+    dob LocalDate
+    gender Gender
+    admin Boolean
+    language Language
+}
+
+entity Team {
+	name String required minlength(3) maxlength(25) unique
+    address Address
+    sport Sport
+}
+
+
+entity Club {
+	name String required
+    address Address
+    sport Sport
+}
+
+entity Competition {
+	name String
+    sport Sport
+}
+
+entity Event {
+	name String,
+	description String
+}
+
+entity Message {
+	content String
+}
+
+/**
+ * The Ground entity.
+ */
+entity Ground {
+	name String
+    address Address
+}
+
+entity TeamMember {
+	role String
+}
+
+entity ClubMember {
+	role String
+}
+
+enum Language {
+    FRENCH, ENGLISH, SPANISH
+}
+
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	User{adminTeam} to Team,
+    User{adminTeam} to Club,
+	User{adminTeam} to Competition
+    Club{team} to Team with jpaDerivedIdentifier
+    Club{member} to ClubMember
+    Team{member} to TeamMember
+}
+
+
+// defining multiple oneToOne relationships
+relationship OneToOne {
+	Event{meetAddress} to Address
+    TeamMember{user} to User with jpaDerivedIdentifier 
+	ClubMember{user} to User with jpaDerivedIdentifier 
+}
+
+// Set pagination options
+paginate Team, User, Club, Competition with infinite-scroll
+// paginate Job with pagination
+
+// Use Data Transfert Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+// service all with serviceImpl except Employee, Job
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
